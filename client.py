@@ -10,11 +10,15 @@ clock = pygame.time.Clock()
 FPS = 60 
 
 RECT_WIDTH = 50
-RECT_HEIGHT = 200
+RECT_HEIGHT = HEIGHT / 3
 ID = 2
 
 rect1 = pygame.Rect(5,HEIGHT/2 - RECT_HEIGHT/2,25,RECT_HEIGHT)
 rect2 = pygame.Rect(WIDTH-30,HEIGHT/2 - RECT_HEIGHT/2,25,RECT_HEIGHT)
+
+
+background = pygame.image.load("./assets/background.png")
+
 
 running = True
 time = 0
@@ -38,10 +42,17 @@ while running:
         elif keys[pygame.K_DOWN]:
             x = 0
             y = 5
-                   
-    screen.fill((0,0,0))
+
+    if ID == 1:
+        rect1.move_ip(x,y)
+    elif ID==2:
+        rect2.move_ip(x,y)
+       
+    #screen.fill((255,255,0))
+    screen.blit(background, (0,0))
     pygame.draw.rect(screen, (255,0,255), rect1)
     pygame.draw.rect(screen, (0,255,255), rect2)
+    
 
 
     pygame.display.update()
