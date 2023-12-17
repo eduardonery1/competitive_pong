@@ -1,7 +1,7 @@
 import pygame  
 import sys  
   
-WIDTH, HEIGHT = (960,540)
+WIDTH, HEIGHT = (1440,810)
 RECT_WIDTH = 50
 RECT_HEIGHT = HEIGHT / 3
 BALL_RADIUS = 15
@@ -13,7 +13,7 @@ clock = pygame.time.Clock()
 FPS = 60 
 
 
-ID = 2
+ID = 1
 
 rect1 = pygame.Rect(5,HEIGHT/2 - RECT_HEIGHT/2,25,RECT_HEIGHT)
 rect2 = pygame.Rect(WIDTH-30,HEIGHT/2 - RECT_HEIGHT/2,25,RECT_HEIGHT)
