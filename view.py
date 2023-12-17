@@ -6,20 +6,24 @@ class View:
     def __init__(self):
         self.screen_width = 1440
         self.screen_height = 810
+        
+    def game_loop(self):
+        pygame.init()
+
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        self.clock = pygame.time.Clock()
-        self.framerate = 60
 
-        self.rect_width = 50
-        self.rect_height = self.screen_height / 3
-        self.dist_from_border_l = 5
-        self.dist_from_border_r = self.
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    running = False
 
-        left_player = pygame.Rect(self.dist_from_border, 
-                                  self.screen_height / 2 - self.rect_height / 2,
-                                  self.rect_width,
-                                  self.rect_width
-                                 )
+            pygame.display.update()
 
-        self.ball_radius = 25
+
+view = View()
+view.game_loop()
+
+
         
