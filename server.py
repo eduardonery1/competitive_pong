@@ -1,5 +1,6 @@
 from user import User
 from game import Game
+import websockets
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
