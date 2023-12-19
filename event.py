@@ -2,10 +2,16 @@ from abc import ABC, abstractmethod
 
 
 class IEvent(ABC):
-    pass
+    def __init__(self, event):
+        pass
 
 
 class KeyboardEvent(IEvent):
+    def __init__(self, event):
+        self.x, self.y = event
+
+
+class WebsocketEvent(IEvent):
     pass
 
 
