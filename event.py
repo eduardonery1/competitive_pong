@@ -8,7 +8,7 @@ class IEvent(ABC):
 
 class KeyboardEvent(IEvent):
     def __init__(self, event):
-        self.x, self.y = event
+        self.y = event
 
 
 class WebsocketEvent(IEvent):

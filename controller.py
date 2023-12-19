@@ -10,23 +10,25 @@ class IController(ABC):
 
 
 class KeyboardController(IController):
-    def __init__(self, model):
+    def __init__(self, model, clock, fps):
         self.model = model
+        self.clock = clock
+        self.fps = fps
+        self.time = 0
 
     def listen(self) -> None:
         while self.model.running:
             self.model.update(self.get_keyboard())
+            self.time = 0
 
-    def get_keyboard(self) -> KeyboardEvent:
+    def get_keyboard(self) -> KeyboardEvent: 
         keys = pygame.key.get_pressed()
-        x, y = (0,0)
+        y = 0
         if keys[pygame.K_UP]:
-            x = 0
             y = -1
         elif keys[pygame.K_DOWN]:
-            x = 0
             y = 1
-        return KeyboardEvent((x, y))
+        return KeyboardEvent(y)
 
 
 

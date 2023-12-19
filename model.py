@@ -1,4 +1,5 @@
 import websockets
+import pygame
 from threading import Thread
 from abc import ABC, abstractmethod
 from event import GameEvent, IEvent
@@ -14,15 +15,17 @@ class IModel(ABC):
 
 class Model(IModel):
     def __init__(self):
-        self.view = View()
-        self.pong = PongViewModel()
-        self.view_model = self.pong
-        self.view.set_scene(self.view_model)
+        pygame.init()
+        self.fps = 60
+        self.clock = pygame.time.Clock()
+
+        self.view = View(self.clock, self.fps)
+        self.view_model = self.view.set_scene(PongViewModel)
         renderer = Thread(target = self.view.render)
         renderer.start()
 
         self.running = True
-        self.keyboard_controller = KeyboardController(self)
+        self.keyboard_controller = KeyboardController(self, self.clock, self.fps)
         keyboard_listener = Thread(target = self.keyboard_controller.listen)
         keyboard_listener.start() 
 
