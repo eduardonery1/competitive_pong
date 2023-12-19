@@ -1,6 +1,5 @@
 from user import User
 from game import Game
-import websockets
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
@@ -11,14 +10,14 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
+    async def connect(self, user: User):
+        await user.websocket.accept()
+        self.active_connections.append(user.websocket)
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
+    async def send_personal_message(self, websocket: WebSocket, message: str):
         await websocket.send_text(message)
 
     async def broadcast(self, message: str):
@@ -34,8 +33,8 @@ async def get():
     return HTMLResponse(html)
 
 
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+@app.websocket("/")
+async def websocket_endpoint(websocket: WebSocket):
     
     pos = len(manager.active_connections)
     playing = False
@@ -47,12 +46,12 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
         #Game handles inner variables
     try:
         while not user.playing:
+            await manager.send_personal_message(websocket, "waiting...")
             pass
 
         while True:
             data = await websocket.receive_json()
             game.update(data) #update both players directily
-            
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         game.close()
