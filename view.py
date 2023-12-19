@@ -1,19 +1,51 @@
 import pygame
-import sys
+from abc import ABC, abstractmethod
+from event import GameEvent
 
-class PongScene:
+
+class View:
+
+    def __init__(self, width = 1440, height = 810):
+        self.screen_width = width
+        self.screen_height = height
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+
+    
+    def set_scene(self,scene):
+        pygame.init()
+        if not scene.is_set:
+           scene.set_source(self.screen)
+
+        self.scene = scene
+
+    def render(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    running = False
+            self.scene.draw()
+            pygame.display.update()
+
+
+class IViewModel(ABC):
+    @abstractmethod
+    def update(event: GameEvent) -> GameEvent:
+        raise NotImplementedError
+
+
+
+class PongViewModel(IViewModel):
     def __init__(self):
         self.is_set = False
 
     def set_source(self, source_screen):
-
         self.screen = source_screen
-
         self.screen_width = source_screen.get_width()
         self.screen_height = source_screen.get_height()
-
+        
         self.background = pygame.image.load("./assets/background.png")
-
         self.ball_radius = 25
         self.rect_width = 50
         self.rect_height = self.screen_height / 3
@@ -38,7 +70,13 @@ class PongScene:
                         )
         
         self.is_set = True
-        
+
+
+    def update(self, event: GameEvent) -> GameEvent :
+        self.left_player.move_ip(event.x, event.y)
+        return event
+
+
     def draw(self):
         self.screen.fill((0,0,0))
         self.screen.blit(self.background, (0,0))
@@ -47,38 +85,10 @@ class PongScene:
         pygame.draw.rect(self.screen, (255,255,255), self.ball, border_radius=self.ball_radius)
 
 
-class View:
 
-    def __init__(self):
-        self.screen_width = 1440
-        self.screen_height = 810
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        
-    def set_scene(self,scene):
-        if not scene.is_set:
-           scene.set_source(self.screen)
+if __name__=="__main__":
+    view = View()
+    pong_scene = PongScene()
+    view.set_scene(pong_scene)
 
-        self.scene = scene
-        
-    def game_loop(self):
-        pygame.init()
-
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    running = False
-
-            self.scene.draw()
-
-            pygame.display.update()
-
-view = View()
-pong_scene = PongScene()
-view.set_scene(pong_scene)
-
-view.game_loop()
 
