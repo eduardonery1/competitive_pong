@@ -1,60 +1,84 @@
-import pygame  
-import sys  
-  
-WIDTH, HEIGHT = (960,540)
-RECT_WIDTH = 50
-RECT_HEIGHT = HEIGHT / 3
-BALL_RADIUS = 15
+import pygame
+import sys
 
-pygame.init()    
-    
-screen = pygame.display.set_mode((WIDTH, HEIGHT))  
-clock = pygame.time.Clock()
-FPS = 60 
+class PongScene:
+    def __init__(self):
+        self.is_set = False
 
+    def set_source(self, source_screen):
 
-ID = 2
+        self.screen = source_screen
 
-rect1 = pygame.Rect(5,HEIGHT/2 - RECT_HEIGHT/2,25,RECT_HEIGHT)
-rect2 = pygame.Rect(WIDTH-30,HEIGHT/2 - RECT_HEIGHT/2,25,RECT_HEIGHT)
-ball = pygame.Rect(WIDTH/2 - BALL_RADIUS, HEIGHT/2 - BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2)
+        self.screen_width = source_screen.get_width()
+        self.screen_height = source_screen.get_height()
 
-background = pygame.image.load("./assets/background.png")
+        self.background = pygame.image.load("./assets/background.png")
 
+        self.ball_radius = 25
+        self.rect_width = 50
+        self.rect_height = self.screen_height / 3
+        self.dist_from_border = 15
 
-running = True
-time = 0
-while running: 
-    dt = clock.tick(FPS) / 1000  # 'dt' will be the amount of seconds since last loop.
-    time += dt
-     
-    for ev in pygame.event.get():  
-        if ev.type == pygame.QUIT:  
-            pygame.quit()  
-            running = False
-
-    x, y = (0,0)
-
-    if time > 1:
-        keys = pygame.key.get_pressed()
+        self.left_player = pygame.Rect(  self.dist_from_border, 
+                                    self.screen_height / 2 - self.rect_height / 2,
+                                    self.rect_width,
+                                    self.rect_height
+                                )
         
-        if keys[pygame.K_UP]:
-            x = 0
-            y = -5
-        elif keys[pygame.K_DOWN]:
-            x = 0
-            y = 5
+        self.right_player = pygame.Rect( self.screen_width - self.rect_width - self.dist_from_border,
+                                    self.screen_height / 2 - self.rect_height / 2,
+                                    self.rect_width,
+                                    self.rect_height
+                                )
+        
+        self.ball = pygame.Rect( self.screen_width / 2 - self.ball_radius,
+                            self.screen_height / 2 - self.ball_radius,
+                            self.ball_radius * 2,
+                            self.ball_radius * 2,
+                        )
+        
+        self.is_set = True
+        
+    def draw(self):
+        self.screen.fill((0,0,0))
+        self.screen.blit(self.background, (0,0))
+        pygame.draw.rect(self.screen, (255,255,255), self.left_player)
+        pygame.draw.rect(self.screen, (255,255,255), self.right_player)
+        pygame.draw.rect(self.screen, (255,255,255), self.ball, border_radius=self.ball_radius)
 
-    if ID == 1:
-        rect1.move_ip(x,y)
-    elif ID==2:
-        rect2.move_ip(x,y)
-       
-    #screen.fill((255,255,0))
-    screen.blit(background, (0,0))
-    pygame.draw.rect(screen, (255,0,255), rect1)
-    pygame.draw.rect(screen, (0,255,255), rect2)
-    pygame.draw.rect(screen, (255,255,0), ball, border_radius=25)
 
+class View:
 
-    pygame.display.update()
+    def __init__(self):
+        self.screen_width = 1440
+        self.screen_height = 810
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        
+    def set_scene(self,scene):
+        if not scene.is_set:
+           scene.set_source(self.screen)
+
+        self.scene = scene
+        
+    def game_loop(self):
+        pygame.init()
+
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    running = False
+
+            self.scene.draw()
+
+            pygame.display.update()
+
+view = View()
+pong_scene = PongScene()
+view.set_scene(pong_scene)
+
+view.game_loop()
+
