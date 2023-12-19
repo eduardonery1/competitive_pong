@@ -1,5 +1,9 @@
-from abc import ABC
+import websockets
+from threading import Thread
+from abc import ABC, abstractmethod
 from event import GameEvent, IEvent
+from view import View, PongViewModel
+from controller import KeyboardController
 
 
 class IModel(ABC):
@@ -7,13 +11,24 @@ class IModel(ABC):
     def update(self, event) -> None:
         pass
 
-class Model:
-    def __init__(self, view):
-        self.view = view
+
+class Model(IModel):
+    def __init__(self):
+        self.view = View()
+        self.pong = PongViewModel()
+        self.view_model = self.pong
+        self.view.set_scene(self.view_model)
+        renderer = Thread(target = self.view.render)
+        renderer.start()
+
         self.running = True
+        self.keyboard_controller = KeyboardController(self)
+        keyboard_listener = Thread(target = self.keyboard_controller.listen)
+        keyboard_listener.start() 
 
     def update(self, event: IEvent) -> None:
-        self.view.update(self.process_event(self, event))
+        self.view_model.update(self.process_event(event))
 
     def process_event(self, event: IEvent) -> GameEvent:
-        raise NotImplementedError 
+        return event 
+        
