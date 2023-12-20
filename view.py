@@ -1,6 +1,7 @@
 import pygame
 from abc import ABC, abstractmethod
 from event import GameEvent
+import math
 
 
 class View:
@@ -19,18 +20,17 @@ class View:
     def render(self):
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         running = True
-        
-        while running:
-            self.dt = self.clock.tick_busy_loop(self.fps)
-            self.time += self.dt
 
+        while running:
+            #self.dt = pygame.time.get_ticks() - self.time
+            #self.time += self.dt
+            self.dt = self.clock.tick(self.fps)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     running = False
-            b = self.scene.draw(self.screen, self.time)
-            if b:
-                self.time = 0
+            self.scene.draw(self.screen, self.dt)
+
             pygame.display.update()
 
 
@@ -76,6 +76,14 @@ class PongViewModel(IViewModel):
                             self.ball_radius * 2,
                             self.ball_radius * 2,
                         )
+        
+        self.player_speed = 350 
+        self.player_speed /= 1000
+
+        self.period = math.ceil(1 / self.player_speed)
+
+        #self.time2 = 0
+        #print(self.left_player.top)
 
 
     def update(self, event: GameEvent) -> GameEvent :
@@ -86,22 +94,23 @@ class PongViewModel(IViewModel):
         return event
 
 
-    def draw(self, source_screen, time):
+    def draw(self, source_screen, dt):
         if self.screen is None:
             self.screen = source_screen
-        b = False
-        if time >= 100:
-            self.left_player.move_ip(0, self.current_mv*50)
-            self.right_player.move_ip(0, self.right_mv*50)
-            b = True
+        #self.time2 += dt 
+        self.time += dt
+        x = self.time // self.period
+        self.left_player.move_ip(0, self.current_mv * x * self.period * self.player_speed)
+        self.time -= x * self.period
 
+        #if self.left_player.top >= 370 and self.time2 > 0:
+        #    print(self.left_player.top, self.time2)
+            
         self.screen.fill((0,0,0))
         self.screen.blit(self.background, (0,0))
         pygame.draw.rect(self.screen, (255,255,255), self.left_player)
         pygame.draw.rect(self.screen, (255,255,255), self.right_player)
         pygame.draw.rect(self.screen, (255,255,255), self.ball, border_radius=self.ball_radius)
-
-        return b
 
 if __name__=="__main__":
     view = View()
