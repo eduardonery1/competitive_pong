@@ -3,8 +3,6 @@ from game import Game
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
-app = FastAPI()
-
 
 class ConnectionManager:
     def __init__(self):
@@ -24,30 +22,35 @@ class ConnectionManager:
         for connection in self.active_connections:
             await connection.send_text(message)
 
-
+app = FastAPI()
 manager = ConnectionManager()
 games = []
+
 
 @app.get("/")
 async def get():
     return HTMLResponse(html)
 
-@app.websocket("/test")
-async def websocket_mirror(websocket):
+
+@app.websocket("/")
+async def websocket_mirror(websocket: WebSocket):
     user = User(websocket, True, 1)
     await manager.connect(user)
-    game = Game(user, user)
+    print("Usuário conectado!")
 
+    game = Game(user, user)
     try:
         while True:
             response = await websocket.receive_json()
+            print(response)
             game.update(response)
     except WebSocketDisconnect:
-        manager.disconnect()
+        manager.disconnect(websocket)
         game.close()
-@app.websocket("/")
+
+
+@app.websocket("/not")
 async def websocket_endpoint(websocket: WebSocket):
-    
     pos = len(manager.active_connections)
     playing = False
     user = User(websocket, playing, pos)

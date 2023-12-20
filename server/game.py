@@ -5,6 +5,6 @@ class Game:
         self.user1.playing = True
         self.user2.playing = True
 
-    async def update(data):
+    async def update(self, data):
         await self.user1.send(data)
         await self.user2.send(data)

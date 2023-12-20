@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
 from json import dumps, loads
 
+
 class IEvent(ABC):
     def __init__(self, event):
         pass
 
 class KeyboardEvent(IEvent):
-    def __init__(self, event):
+    def __init__(self, event, player):
         self.y = event
+        self.player = player
 
     def to_json(self):
         return dumps({"dy": self.y})
@@ -21,7 +23,4 @@ class WebsocketEvent(IEvent):
 class GameEvent(IEvent):
     def __init__(self, event:IEvent, player):
         self.y = event.y
-        if isinstance(event, KeyboardEvent):
-            self.player = player
-        else:
-            self.player = event.player
+        self.player = player

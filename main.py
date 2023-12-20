@@ -1,10 +1,16 @@
 from model import Model
-from controller import ServerController
+from controller import ServerController, KeyboardController
 
 
 if __name__ == "__main__":
     game = Model()
-    websocket = ServerController(game)
+    
+    keyboard = KeyboardController(game)
+    keyboard.listen()
 
-    game.set_remote(websocket)
-    websocket.listen()
+    server = ServerController(game)
+    print("Yep")
+    game.set_remote(server)
+    
+
+

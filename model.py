@@ -17,30 +17,29 @@ class IModel(ABC):
 class Model(IModel):
     def __init__(self):
         pygame.init()
+        self.running = True
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.player = "left"
 
+        self.websocket_controller = None
+        
         self.view = View(self.clock, self.fps)
         self.view_model = self.view.set_scene(PongViewModel)
         renderer = Thread(target = self.view.render)
-        self.running = True
-        self.keyboard_controller = KeyboardController(self, self.clock, self.fps)
-        keyboard_listener = Thread(target = self.keyboard_controller.listen)
-        self.websocket_controller = None
-        
-        keyboard_listener.start() 
         renderer.start()
+    
+    
+    def set_remote(self, remote: ServerController) -> None:
+        self.websocket_controller = remote
 
-    def set_remote(self, websocket):
-        self.websocket_controller = websocket
-
-    async def update(self, event: IEvent) -> None:
+    def update(self, event: IEvent) -> None:
         self.view_model.update(self.process_event(event))
 
-    async def process_event(self, event: IEvent) -> GameEvent:
+    def process_event(self, event: IEvent) -> GameEvent:
         if isinstance(event, KeyboardEvent):
-            await self.websocket_controller.send_event(event)  
+            if self.websocket_controller is not None:
+                self.websocket_controller.send_event(event) 
         elif isinstance(event, WebsocketEvent):
             pass
         return GameEvent(event, self.player) 
