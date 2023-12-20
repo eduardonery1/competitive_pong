@@ -22,7 +22,9 @@ class View:
         running = True
 
         while running:
-            self.dt = self.clock.tick()
+            #self.dt = pygame.time.get_ticks() - self.time
+            #self.time += self.dt
+            self.dt = self.clock.tick(self.fps)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -73,25 +75,33 @@ class PongViewModel(IViewModel):
                             self.ball_radius * 2,
                             self.ball_radius * 2,
                         )
-        self.time2 = 0
-        print(self.left_player.top)
+        
+        self.player_speed = 350 
+        self.player_speed /= 1000
+
+        self.period = math.ceil(1 / self.player_speed)
+
+        #self.time2 = 0
+        #print(self.left_player.top)
 
 
     def update(self, event: GameEvent) -> GameEvent :
-        self.current_mv = 1
+        self.current_mv = event.y
         return event
 
 
     def draw(self, source_screen, dt):
         if self.screen is None:
             self.screen = source_screen
+
+        #self.time2 += dt 
         self.time += dt
-        self.left_player.move_ip(0, self.current_mv * dt * 0.03)
+        x = self.time // self.period
+        self.left_player.move_ip(0, self.current_mv * x * self.period * self.player_speed)
+        self.time -= x * self.period
 
-        if self.left_player.top >= 370 and self.time2 == 0:
-            self.time2 = self.time
-            print(self.left_player.top, self.time2)
-
+        #if self.left_player.top >= 370 and self.time2 > 0:
+        #    print(self.left_player.top, self.time2)
             
         self.screen.fill((0,0,0))
         self.screen.blit(self.background, (0,0))
