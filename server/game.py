@@ -7,4 +7,5 @@ class Game:
 
     async def update(self, data):
         await self.user1.send(data)
-        await self.user2.send(data)
+        if self.user1 is not self.user2:
+            await self.user2.send(data)

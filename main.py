@@ -9,8 +9,5 @@ if __name__ == "__main__":
     keyboard.listen()
 
     server = ServerController(game)
-    print("Yep")
     game.set_remote(server)
-    
-
 

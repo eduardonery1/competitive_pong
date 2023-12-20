@@ -6,6 +6,7 @@ class IEvent(ABC):
     def __init__(self, event):
         pass
 
+
 class KeyboardEvent(IEvent):
     def __init__(self, event, player):
         self.y = event
@@ -13,6 +14,7 @@ class KeyboardEvent(IEvent):
 
     def to_json(self):
         return dumps({"dy": self.y})
+
 
 class WebsocketEvent(IEvent):
     def __init__(self, message):

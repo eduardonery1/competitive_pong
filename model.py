@@ -29,7 +29,6 @@ class Model(IModel):
         renderer = Thread(target = self.view.render)
         renderer.start()
     
-    
     def set_remote(self, remote: ServerController) -> None:
         self.websocket_controller = remote
 
@@ -41,5 +40,5 @@ class Model(IModel):
             if self.websocket_controller is not None:
                 self.websocket_controller.send_event(event) 
         elif isinstance(event, WebsocketEvent):
-            pass
+            pass     
         return GameEvent(event, self.player) 

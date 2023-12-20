@@ -18,8 +18,12 @@ class KeyboardController(IController):
         self.model = model
     
     def _listen(self) -> None:
+        last_key = None
         while self.model.running:
-            self.model.update(self._get_keyboard())
+            key = self._get_keyboard()
+            if last_key is None or key.y != last_key.y:
+                self.model.update(key)
+                last_key = key
 
     def listen(self) -> None:
         th = Thread(target = self._listen)
@@ -38,33 +42,15 @@ class KeyboardController(IController):
 class ServerController(IController):
     def __init__(self, model):
         self.model = model
-        #self.ws = websocket.WebSocketApp("ws://192.168.26.228:8080/", on_message=self.listen)
         self.ws = create_connection("ws://192.168.26.228:8080/")
-
-
-        #self.ws.run_forever(dispatcher=rel, reconnect=5)
-        #print("ws running...")
-        wb_th = Thread(target = self.listen2, args=(self, self.ws))
+        wb_th = Thread(target = self.listen, args=(self.ws))
         wb_th.start()
-        print("ws running")
 
-        #rel.signal(2, rel.abort)  # Keyboard Interrupt
-        #rel.dispatch()
-
-    def listen2(self, ws):
+    def listen(self, ws):
         while self.model.running:
-            event = loads(ws.recv())
-            print(event)
-
+            event = WebsocketEvent(ws.recv())
         ws.close()
 
-        
-
-    @staticmethod
-    def listen(wsapp, message):
-        event_data = loads(message)
-        print(event_data)
-       
     def send_event(self, event):
         self.ws.send(event.to_json())
         print(event.to_json())

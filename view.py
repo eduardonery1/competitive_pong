@@ -101,6 +101,7 @@ class PongViewModel(IViewModel):
         self.time += dt
         x = self.time // self.period
         self.left_player.move_ip(0, self.current_mv * x * self.period * self.player_speed)
+        self.right_player.move_ip(0, self.current_mv * x * self.period * self.player_speed)
         self.time -= x * self.period
 
         #if self.left_player.top >= 370 and self.time2 > 0:
