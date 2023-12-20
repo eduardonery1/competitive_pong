@@ -48,6 +48,7 @@ class PongViewModel(IViewModel):
         self.screen_height = screen_height
         self.screen_width = screen_width
         self.current_mv = 0
+        self.right_mv = 0
         self.clock = pygame.time.Clock()
         self.time = 0
 
@@ -78,7 +79,10 @@ class PongViewModel(IViewModel):
 
 
     def update(self, event: GameEvent) -> GameEvent :
-        self.current_mv = event.y
+        if event.player == "left":
+            self.current_mv = event.y
+        else:
+            self.right_mv = event.y
         return event
 
 
@@ -88,6 +92,7 @@ class PongViewModel(IViewModel):
         b = False
         if time >= 100:
             self.left_player.move_ip(0, self.current_mv*50)
+            self.right_player.move_ip(0, self.right_mv*50)
             b = True
 
         self.screen.fill((0,0,0))

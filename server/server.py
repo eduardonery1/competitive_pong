@@ -32,7 +32,19 @@ games = []
 async def get():
     return HTMLResponse(html)
 
+@app.websocket("/test")
+async def websocket_mirror(websocket):
+    user = User(websocket, True, 1)
+    await manager.connect(user)
+    game = Game(user, user)
 
+    try:
+        while True:
+            response = await websocket.receive_json()
+            game.update(response)
+    except WebSocketDisconnect:
+        manager.disconnect()
+        game.close()
 @app.websocket("/")
 async def websocket_endpoint(websocket: WebSocket):
     

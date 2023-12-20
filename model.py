@@ -1,10 +1,11 @@
-import websockets
 import pygame
+from websockets.sync.client import connect
 from threading import Thread
 from abc import ABC, abstractmethod
-from event import GameEvent, IEvent
+from event import GameEvent, KeyboardEvent, WebsocketEvent, IEvent
 from view import View, PongViewModel
-from controller import KeyboardController
+from controller import KeyboardController, ServerController
+
 
 
 class IModel(ABC):
@@ -18,20 +19,28 @@ class Model(IModel):
         pygame.init()
         self.fps = 60
         self.clock = pygame.time.Clock()
+        self.player = "left"
 
         self.view = View(self.clock, self.fps)
         self.view_model = self.view.set_scene(PongViewModel)
         renderer = Thread(target = self.view.render)
-        renderer.start()
-
         self.running = True
         self.keyboard_controller = KeyboardController(self, self.clock, self.fps)
         keyboard_listener = Thread(target = self.keyboard_controller.listen)
+        self.websocket_controller = None
+        
         keyboard_listener.start() 
+        renderer.start()
 
-    def update(self, event: IEvent) -> None:
+    def set_remote(self, websocket):
+        self.websocket_controller = websocket
+
+    async def update(self, event: IEvent) -> None:
         self.view_model.update(self.process_event(event))
 
-    def process_event(self, event: IEvent) -> GameEvent:
-        return event 
-        
+    async def process_event(self, event: IEvent) -> GameEvent:
+        if isinstance(event, KeyboardEvent):
+            await self.websocket_controller.send_event(event)  
+        elif isinstance(event, WebsocketEvent):
+            pass
+        return GameEvent(event, self.player) 

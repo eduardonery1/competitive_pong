@@ -1,5 +1,5 @@
 import pygame
-import websockets
+from websockets.sync.client import connect
 from event import IEvent, KeyboardEvent, WebsocketEvent
 from abc import ABC, abstractmethod
 
@@ -33,12 +33,15 @@ class KeyboardController(IController):
 
 
 class ServerController(IController):
-    def __init__(self, model, websocket):
+    def __init__(self, model):
         self.model = model
-        self.websocket = websocket
+        self.websocket = connect("ws://192.168.26.228:8080")
+        
+
+    async def send_event(self, event: IEvent) -> None:
+        await self.websocket.send(event.to_json())
 
     async def listen(self) -> None:
-        while self.model.running:
-            response = await self.websocket.recv()
-            self.model.update(WebsocketEvent(response))
+        async for message in self.websocket:
+            self.model.update(WebsocketEvent(message))
         
