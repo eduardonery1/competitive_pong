@@ -6,14 +6,13 @@ class IEvent(ABC):
     def __init__(self, event):
         pass
 
+    def to_json(self):
+        return dumps({"y":self.y, "player":self.player})
+
 
 class KeyboardEvent(IEvent):
-    def __init__(self, event, player):
+    def __init__(self, event):
         self.y = event
-        self.player = player
-
-    def to_json(self):
-        return dumps({"dy": self.y})
 
 
 class WebsocketEvent(IEvent):
@@ -22,7 +21,8 @@ class WebsocketEvent(IEvent):
         self.y = response["y"]
         self.player = response["player"]
 
+
 class GameEvent(IEvent):
-    def __init__(self, event:IEvent, player):
-        self.y = event.y
+    def __init__(self, y, player):
+        self.y = y
         self.player = player

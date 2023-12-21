@@ -37,8 +37,10 @@ class Model(IModel):
 
     def process_event(self, event: IEvent) -> GameEvent:
         if isinstance(event, KeyboardEvent):
+            new_event = GameEvent(event.y, self.player)
             if self.websocket_controller is not None:
-                self.websocket_controller.send_event(event) 
+                self.websocket_controller.send_event(new_event) 
+            return new_event
         elif isinstance(event, WebsocketEvent):
-            pass     
-        return GameEvent(event, self.player) 
+            print(event.to_json())
+            return GameEvent(event.y, event.player)

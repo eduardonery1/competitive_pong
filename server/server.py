@@ -43,7 +43,7 @@ async def websocket_mirror(websocket: WebSocket):
         while True:
             response = await websocket.receive_json()
             print(response)
-            game.update(response)
+            await game.update(response)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         game.close()

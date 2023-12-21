@@ -1,3 +1,6 @@
+from json import dumps
+
+
 class Game:
     def __init__(self, user1, user2):
         self.user1 = user1
@@ -6,6 +9,13 @@ class Game:
         self.user2.playing = True
 
     async def update(self, data):
-        await self.user1.send(data)
-        if self.user1 is not self.user2:
-            await self.user2.send(data)
+        #data["type"] = 'websocket.send' 
+        #data = dumps(data)
+        if data["player"] == 'left':
+            if self.user2 is not self.user1:
+                await self.user2.websocket.send_json(data)
+            else:
+                data["player"] = 'right'
+                await self.user1.websocket.send_json(data)
+        elif data["player"] == 'right':
+            await self.user1.websocket.send_json(data)
