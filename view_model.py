@@ -104,9 +104,11 @@ class PongViewModel(IViewModel):
         scored = False
         if self.ball.centerx - self.ball_radius < 0:
             self.right_score += 1
+            self.ball_mv_x = 1
             scored = True
         elif self.ball.centerx + self.ball_radius > self.screen_width:
             self.left_score += 1
+            self.ball_mv_x = -1
             scored = True
 
         if scored:

@@ -10,7 +10,11 @@ class BotPlayer:
     def _play(self):
         while self.model.running:
             ball_pos = self.view_model.ball.centery
-            player_pos = self.view_model.right_player.bottomleft[1]
+            player_posbl = self.view_model.right_player.bottomleft[1]
+            player_postr = self.view_model.right_player.topright[1]
+            player_pos = player_posbl
+            if abs(ball_pos - player_posbl) > abs(ball_pos - player_postr):
+                player_pos = player_postr
             mv = 0
             if ball_pos > player_pos:
                 mv = 1
