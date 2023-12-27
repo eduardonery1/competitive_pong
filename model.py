@@ -15,22 +15,23 @@ class IModel(ABC):
 
 
 class Model(IModel):
-    def __init__(self):
+    def __init__(self, online = False):
         pygame.init()
         self.running = True
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.player = "left"
-
+        
         self.websocket_controller = None
+        if online:
+            self.websocket_controller = ServerController(self)
         
         self.view = View(self.clock, self.fps)
         self.view_model = self.view.set_scene(PongViewModel)
-        renderer = Thread(target = self.view.render)
-        renderer.start()
-    
-    def set_remote(self, remote: ServerController) -> None:
-        self.websocket_controller = remote
+        self.view.render()        
+
+        self.keyboard = KeyboardController(self)
+        self.keyboard.listen()
 
     def update(self, event: IEvent) -> None:
         self.view_model.update(self.process_event(event))

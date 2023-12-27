@@ -66,7 +66,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
         while True:
             data = await websocket.receive_json()
-            game.update(data) #update both players directily
+            await game.update(data) #update both players directily
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         game.close()
