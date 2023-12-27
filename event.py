@@ -22,6 +22,11 @@ class WebsocketEvent(IEvent):
         self.player = response["player"]
 
 
+class ChangeSceneEvent(IEvent):
+    def __init__(self):
+        pass
+
+
 class GameEvent(IEvent):
     def __init__(self, y, player):
         self.y = y

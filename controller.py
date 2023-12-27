@@ -29,6 +29,7 @@ class KeyboardController(IController):
         th = Thread(target = self._listen)
         th.start()
         print("listening keyboard...")
+
     def _get_keyboard(self) -> KeyboardEvent: 
         keys = pygame.key.get_pressed()
         y = 0
@@ -44,6 +45,7 @@ class ServerController(IController):
         self.model = model
         print("connecting to server...")
         self.ws = create_connection("ws://192.168.1.100:8080/")
+        self.model.player = WebsocketEvent(self.ws.recv()).player
         wb_th = Thread(target = self.listen, args=(self.model, self.ws))
         wb_th.start()
 

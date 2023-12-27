@@ -1,11 +1,12 @@
 import pygame
+from bot import BotPlayer
 from websockets.sync.client import connect
 from threading import Thread
 from abc import ABC, abstractmethod
-from event import GameEvent, KeyboardEvent, WebsocketEvent, IEvent
-from view import View, PongViewModel
+from event import *
+from view_model import PongViewModel
+from view import View
 from controller import KeyboardController, ServerController
-
 
 
 class IModel(ABC):
@@ -21,10 +22,9 @@ class Model(IModel):
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.player = "left"
-        
+ 
         self.websocket_controller = None
-        if online:
-            self.websocket_controller = ServerController(self)
+        self.bot = None
         
         self.view = View(self.clock, self.fps)
         self.view_model = self.view.set_scene(PongViewModel)
@@ -32,7 +32,11 @@ class Model(IModel):
 
         self.keyboard = KeyboardController(self)
         self.keyboard.listen()
-
+        if online:
+            self.websocket_controller = ServerController(self)
+        else:        
+            self.bot = BotPlayer(self, self.view_model)
+ 
     def update(self, event: IEvent) -> None:
         self.view_model.update(self.process_event(event))
 
@@ -43,5 +47,9 @@ class Model(IModel):
                 self.websocket_controller.send_event(new_event) 
             return new_event
         elif isinstance(event, WebsocketEvent):
-            print(event.to_json())
+            print("Server sent:", event.to_json())
             return GameEvent(event.y, event.player)
+        elif isinstance(event, ChangeSceneEvent):
+            pass
+        elif isinstance(event, GameEvent):
+            return event

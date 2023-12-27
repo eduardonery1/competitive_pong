@@ -9,8 +9,6 @@ class Game:
         self.user2.playing = True
 
     async def update(self, data):
-        #data["type"] = 'websocket.send' 
-        #data = dumps(data)
         if data["player"] == 'left':
             if self.user2 is not self.user1:
                 await self.user2.websocket.send_json(data)
