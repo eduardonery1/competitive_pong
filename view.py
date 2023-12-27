@@ -172,7 +172,7 @@ class PongViewModel(IViewModel):
         pygame.draw.rect(self.screen, (255,255,255), self.right_player)
         pygame.draw.rect(self.screen, (255,255,255), self.ball, border_radius=self.ball_radius)
         if self.img is not None:
-            self.screen.blit(self.img, (self.screen_width//2 - 50/1440*self.screen_width, 20))
+            self.screen.blit(self.img, (self.screen_width//2 - 45/1440*self.screen_width, 20))
 if __name__=="__main__":
     pass
 
