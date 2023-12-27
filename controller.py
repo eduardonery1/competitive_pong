@@ -43,7 +43,7 @@ class ServerController(IController):
     def __init__(self, model):
         self.model = model
         print("connecting to server...")
-        self.ws = create_connection("ws://192.168.26.228:8080/")
+        self.ws = create_connection("ws://192.168.1.100:8080/")
         wb_th = Thread(target = self.listen, args=(self.model, self.ws))
         wb_th.start()
 

@@ -4,6 +4,7 @@ from threading import Thread
 from abc import ABC, abstractmethod
 from event import GameEvent
 
+
 class IView(ABC):
     @abstractmethod
     def render(self) -> None:
@@ -50,6 +51,8 @@ class IViewModel(ABC):
     def draw(screen):
         pass
 
+
+
 class PongViewModel(IViewModel):
     def __init__(self, screen_width, screen_height):
         self.screen_height = screen_height
@@ -73,6 +76,7 @@ class PongViewModel(IViewModel):
         self.rect_width = 50
         self.rect_height = self.screen_height / 3
         self.dist_from_border = 15
+        self.font = pygame.font.SysFont(None, 96)
 
         self.left_player = pygame.Rect(  self.dist_from_border, 
                                     self.screen_height / 2 - self.rect_height / 2,
@@ -95,11 +99,13 @@ class PongViewModel(IViewModel):
         self.player_speed = 350 
         self.player_speed /= 1000
         
-        self.ball_speed = 350
+        self.ball_speed = 700
         self.ball_speed /= 1000
         
         self.player_period = math.ceil(1 / self.player_speed)
         self.ball_period = math.ceil(1 / self.ball_speed)
+
+        self.img = None
         #self.time2 = 0
         #print(self.left_player.top)
 
@@ -143,6 +149,8 @@ class PongViewModel(IViewModel):
             scored = True
 
         if scored:
+            self.img = self.font.render(f'{self.left_score} {self.right_score}', True, (255, 255, 255))
+            self.ball_speed += self.ball_speed * 0
             self.ball = pygame.Rect( self.screen_width / 2 - self.ball_radius,
                               self.screen_height / 2 - self.ball_radius,
                               self.ball_radius * 2,
@@ -150,7 +158,7 @@ class PongViewModel(IViewModel):
                           )
         self.ball_time -= ballx * self.ball_period
         self.player_time -= playerx * self.player_period
-        
+         
     def draw(self, source_screen, dt):
         if self.screen is None:
             self.screen = source_screen
@@ -163,7 +171,8 @@ class PongViewModel(IViewModel):
         pygame.draw.rect(self.screen, (255,255,255), self.left_player)
         pygame.draw.rect(self.screen, (255,255,255), self.right_player)
         pygame.draw.rect(self.screen, (255,255,255), self.ball, border_radius=self.ball_radius)
-
+        if self.img is not None:
+            self.screen.blit(self.img, (self.screen_width//2 - 50/1440*self.screen_width, 20))
 if __name__=="__main__":
     pass
 

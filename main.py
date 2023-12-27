@@ -3,6 +3,6 @@ from controller import ServerController, KeyboardController
 
 
 if __name__ == "__main__":
-    game = Model()
+    game = Model(online = True)
     
 
