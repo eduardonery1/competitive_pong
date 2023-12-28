@@ -1,7 +1,7 @@
 import pygame
+import rel
 from websocket import create_connection
 from threading import Thread
-import rel
 from json import loads, dumps
 from event import IEvent, KeyboardEvent, WebsocketEvent
 from abc import ABC, abstractmethod 
@@ -18,12 +18,17 @@ class KeyboardController(IController):
         self.model = model
     
     def _listen(self) -> None:
+        last_key = None
         while self.model.running:
-            self.model.update(self._get_keyboard())
+            key = self._get_keyboard()
+            if last_key is None or key.y != last_key.y:
+                self.model.update(key)
+                last_key = key
 
     def listen(self) -> None:
         th = Thread(target = self._listen)
         th.start()
+        print("listening keyboard...")
 
     def _get_keyboard(self) -> KeyboardEvent: 
         keys = pygame.key.get_pressed()
@@ -32,39 +37,26 @@ class KeyboardController(IController):
             y = -1
         elif keys[pygame.K_DOWN]:
             y = 1
-        return KeyboardEvent(y, self.model.player)
+        return KeyboardEvent(y)
 
 
 class ServerController(IController):
     def __init__(self, model):
         self.model = model
-        #self.ws = websocket.WebSocketApp("ws://192.168.26.228:8080/", on_message=self.listen)
-        self.ws = create_connection("ws://192.168.26.228:8080/")
-
-
-        #self.ws.run_forever(dispatcher=rel, reconnect=5)
-        #print("ws running...")
-        wb_th = Thread(target = self.listen2, args=(self, self.ws))
+        print("connecting to server...")
+        self.ws = create_connection("ws://192.168.1.100:8080/")
+        self.model.player = WebsocketEvent(self.ws.recv()).player
+        wb_th = Thread(target = self.listen, args=(self.model, self.ws))
         wb_th.start()
-        print("ws running")
-
-        #rel.signal(2, rel.abort)  # Keyboard Interrupt
-        #rel.dispatch()
-
-    def listen2(self, ws):
-        while self.model.running:
-            event = loads(ws.recv())
-            print(event)
-
-        ws.close()
-
-        
 
     @staticmethod
-    def listen(wsapp, message):
-        event_data = loads(message)
-        print(event_data)
-       
-    def send_event(self, event):
+    def listen(model, ws):
+        print("listening to websocket")
+        while model.running:
+            event = WebsocketEvent(ws.recv())
+            model.update(event)
+        ws.close()
+
+    def send_event(self, event: IEvent) -> None:
         self.ws.send(event.to_json())
-        print(event.to_json())
+        #print(event.to_json())

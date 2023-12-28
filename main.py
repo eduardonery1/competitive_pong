@@ -3,14 +3,6 @@ from controller import ServerController, KeyboardController
 
 
 if __name__ == "__main__":
-    game = Model()
+    game = Model(online = False)
     
-    keyboard = KeyboardController(game)
-    keyboard.listen()
-
-    server = ServerController(game)
-    print("Yep")
-    game.set_remote(server)
-    
-
 
